@@ -9,7 +9,7 @@ endgames = ["You gave up.", \
 
 
 
-def class():
+def escape():
 	os.system("clear")
 	print("You are in class for an hour and a half. Good luck.")
 	state = ["sitting", 0]
@@ -89,4 +89,4 @@ def do_option(option, state):
 				return ["quit", 3]
 		return ["quit", 1]
 
-class()
+escape()
