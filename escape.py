@@ -47,7 +47,8 @@ def get_options(state):
 		options += ["stop participating", "keep participating!"]
 	return options
 
-# method takes two string parameters option and state and returns a string state
+# method takes two string parameters option and state and returns a string state and an exit code
+# the program will only run the exit code if the state is "quit"
 # could and should possibly make this into a dictionary in the future
 def do_option(option, state):
 	if option == "quit":
