@@ -7,7 +7,25 @@ endgames = ["You gave up.", \
 "You participate so much that the professor remembers your name for the rest of the semester. You still only get an A-.", \
 "You have successfully escaped from class! Good luck passing without any notes."]
 
-
+def get_valid_int(start, end, text):
+	choice = -1
+	try:
+		choice = int(input(text))
+	except ValueError:
+		choice = -1
+	else:
+		if choice < start or choice >= end:
+			choice = -1
+	while (choice == -1):
+		print("That was not an option!")
+		try:
+			choice = int(input(text))
+		except ValueError:
+			choice = -1
+		else:
+			if choice < start or choice >= end:
+				choice = -1
+	return choice
 
 def escape():
 	os.system("clear")
@@ -22,7 +40,7 @@ def escape():
 		for option in options:
 			i += 1
 			print(str(i) + ": " + option)
-		choice = int(input("Type the number of your choice: ")) # please to add error checking
+		choice = get_valid_int(1, len(options)+1, "Type the number of your choice: ")
 		state = do_option(options[choice-1], state[0])
 		if state[0] == "quit":
 			quit = 1
