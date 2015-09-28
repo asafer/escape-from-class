@@ -59,58 +59,50 @@ def get_options(state):
 	"drawing": ["stop drawing", "make masterpiece"], \
 	"participating": ["stop participating", "keep participating!"]}
 
-	options = ["quit"]
+	options = ["quit", "check inventory"]
 	if state in states:
 		options += states[state]
 	return options
 
 # method takes two string parameters option and state and returns a string state and an exit code
 # the program will only run the exit code if the state is "quit"
-# could and should possibly make this into a dictionary in the future
 def do_option(option, state):
 	global inventory
 	if option == "quit":
 		return ["quit", "default"]
+	elif option == "check inventory":
+		if len(inventory) == 0:
+			print("Your inventory is empty!")
+		else:
+			print("Inventory contents:")
+			[print(item) for item in inventory]
+		return [state, "default"]
 	else:
-		if state == "sitting":
-			if option == "listen":
-				return ["listening", "default"]
-			elif  option == "gossip":
-				return ["talking", "default"]
-			elif option == "stand":
-				return ["standing", "default"]
-			elif option == "doodle":
-				return ["drawing", "default"]
-		if state == "talking":
-			if option == "stop talking":
-				return ["sitting", "default"]
-			elif option == "keep talking":
-				if "gossip" in inventory:
-					print("You have already learned enough information!")
+		states = {"sitting": {"listen": ["listening", "default"], \
+					"gossip": ["talking", "default"], \
+					"stand": ["standing", "default"], \
+					"doodle": ["drawing", "default"]}, \
+		"talking": {"stop talking": ["sitting", "default"], \
+					"keep talking": ["talking", "default", 1, "valuable gossip"]}, \
+		"listening": {"stop listening": ["sitting", "default"], \
+					"participate": ["participating", "default"]}, \
+		"standing": {"sit": ["sitting", "default"], \
+					"leave class": ["quit", "outside"]}, \
+		"participating": {"stop participating": ["sitting", "default"], \
+					"keep participating!": ["quit", "smart"]}, \
+		"drawing": {"stop drawing": ["sitting", "default"], \
+					"make masterpiece": ["quit", "draw"]}}
+		if state in states and option in states[state]:
+			value = states[state][option]
+			if len(value) == 2: # no addition to inventory
+				return value
+			else: # adding somthing to inventory
+				if value[2] <= inventory.count(value[3]): # number of item allowed in inventory
+					print("You can't add more", value[3], "to your inventory right now!")
 				else:
-					inventory += ["gossip"]
-					print("You have learned a valuable piece of information!")
-				return ["talking", "default"]
-		if state == "listening":
-			if option == "stop listening":
-				return ["sitting", "default"]
-			elif option == "participate":
-				return ["participating", "default"]
-		if state == "standing":
-			if option == "sit":
-				return ["sitting", "default"]
-			elif option == "leave class":
-				return ["quit", "outside"]
-		if state == "drawing":
-			if option == "stop drawing":
-				return ["sitting", "default"]
-			elif option == "make masterpiece":
-				return ["quit", "draw"]
-		if state == "participating":
-			if option == "stop participating":
-				return ["listening", "default"]
-			elif option == "keep participating!":
-				return ["quit", "smart"]
-		return ["quit", "error"]
+					inventory += [value[3]] # item to add is in fourth slot
+					print(value[3], "has been added to your inventory!")
+				return value[:2]
+	return ["quit", "error"]
 
 escape()
