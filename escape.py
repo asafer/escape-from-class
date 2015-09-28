@@ -1,4 +1,5 @@
 import os
+from inventory import *
 
 # When you reach the end of your path - these are in a specific order on purpose
 endgames = {"default": "You gave up.", \
@@ -8,7 +9,7 @@ endgames = {"default": "You gave up.", \
 "outside": "You have successfully escaped from class! Good luck passing without any notes."}
 
 # now we can store things yay!
-inventory = []
+itory = None
 
 def get_valid_int(start, end, text):
 	choice = -1
@@ -31,7 +32,9 @@ def get_valid_int(start, end, text):
 	return choice
 
 def escape():
+	global itory
 	os.system("clear")
+	itory = Inventory()
 	print("You are in class for an hour and a half. Good luck.")
 	state = ["sitting", "default"]
 	quit = 0
@@ -66,16 +69,13 @@ def get_options(state):
 
 # method takes two string parameters option and state and returns a string state and an exit code
 # the program will only run the exit code if the state is "quit"
+# thinking about making inventory additions into a class for easier program reading
 def do_option(option, state):
-	global inventory
+	global itory
 	if option == "quit":
 		return ["quit", "default"]
 	elif option == "check inventory":
-		if len(inventory) == 0:
-			print("Your inventory is empty!")
-		else:
-			print("Inventory contents:")
-			[print(item) for item in inventory]
+		print(itory)
 		return [state, "default"]
 	else:
 		states = {"sitting": {"listen": ["listening", "default"], \
@@ -83,7 +83,7 @@ def do_option(option, state):
 					"stand": ["standing", "default"], \
 					"doodle": ["drawing", "default"]}, \
 		"talking": {"stop talking": ["sitting", "default"], \
-					"keep talking": ["talking", "default", 1, "valuable gossip"]}, \
+					"keep talking": ["talking", "default", "valuable gossip", 1]}, \
 		"listening": {"stop listening": ["sitting", "default"], \
 					"participate": ["participating", "default"]}, \
 		"standing": {"sit": ["sitting", "default"], \
@@ -96,12 +96,8 @@ def do_option(option, state):
 			value = states[state][option]
 			if len(value) == 2: # no addition to inventory
 				return value
-			else: # adding somthing to inventory
-				if value[2] <= inventory.count(value[3]): # number of item allowed in inventory
-					print("You can't add more", value[3], "to your inventory right now!")
-				else:
-					inventory += [value[3]] # item to add is in fourth slot
-					print(value[3], "has been added to your inventory!")
+			else: # adding somthing to inventory (this is currently confusing)
+				itory.add(value[2], value[3])
 				return value[:2]
 	return ["quit", "error"]
 
