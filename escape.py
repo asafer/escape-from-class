@@ -1,11 +1,14 @@
 import os
 
 # When you reach the end of your path - these are in a specific order on purpose
-endgames = ["You gave up.", \
-"You have managed to find a path that ends nowhere. Good luck with that.", \
-"You draw a masterpiece which is bought for five million dollars. You decide to quit college and live off of that. Congratulations!", \
-"You participate so much that the professor remembers your name for the rest of the semester. You still only get an A-.", \
-"You have successfully escaped from class! Good luck passing without any notes."]
+endgames = {"default": "You gave up.", \
+"error": "You have managed to find a path that ends nowhere. Good luck with that.", \
+"draw": "You draw a masterpiece which is bought for five million dollars. You decide to quit college and live off of that. Congratulations!", \
+"smart": "You participate so much that the professor remembers your name for the rest of the semester. You still only get an A-.", \
+"outside": "You have successfully escaped from class! Good luck passing without any notes."}
+
+# now we can store things yay!
+inventory = []
 
 def get_valid_int(start, end, text):
 	choice = -1
@@ -30,7 +33,7 @@ def get_valid_int(start, end, text):
 def escape():
 	os.system("clear")
 	print("You are in class for an hour and a half. Good luck.")
-	state = ["sitting", 0]
+	state = ["sitting", "default"]
 	quit = 0
 	while (not quit):
 		print("Your current state is:", state[0])
@@ -48,64 +51,66 @@ def escape():
 
 
 # method takes a string parameter state and returns a list of string options
-# could and should possibly make this into a dictionary in the future
 def get_options(state):
+	states = {"sitting": ["listen", "gossip", "stand", "doodle"], \
+	"listening": ["participate", "stop listening"], \
+	"talking": ["stop talking", "keep talking"], \
+	"standing": ["sit", "leave class"], \
+	"drawing": ["stop drawing", "make masterpiece"], \
+	"participating": ["stop participating", "keep participating!"]}
+
 	options = ["quit"]
-	if state == "sitting":
-		options += ["listen", "gossip", "stand", "doodle"]
-	if state == "listening":
-		options += ["participate", "stop listening"]
-	if state == "talking":
-		options += ["stop talking", "keep talking"]
-	if state == "standing":
-		options += ["sit", "leave class"]
-	if state == "drawing":
-		options += ["stop drawing", "make masterpiece"]
-	if state == "participating":
-		options += ["stop participating", "keep participating!"]
+	if state in states:
+		options += states[state]
 	return options
 
 # method takes two string parameters option and state and returns a string state and an exit code
 # the program will only run the exit code if the state is "quit"
 # could and should possibly make this into a dictionary in the future
 def do_option(option, state):
+	global inventory
 	if option == "quit":
-		return ["quit", 0]
+		return ["quit", "default"]
 	else:
 		if state == "sitting":
 			if option == "listen":
-				return ["listening", 0]
+				return ["listening", "default"]
 			elif  option == "gossip":
-				return ["talking", 0]
+				return ["talking", "default"]
 			elif option == "stand":
-				return ["standing", 0]
+				return ["standing", "default"]
 			elif option == "doodle":
-				return ["drawing", 0]
+				return ["drawing", "default"]
 		if state == "talking":
 			if option == "stop talking":
-				return ["sitting", 0]
+				return ["sitting", "default"]
 			elif option == "keep talking":
-				return ["talking", 0]
+				if "gossip" in inventory:
+					print("You have already learned enough information!")
+				else:
+					inventory += ["gossip"]
+					print("You have learned a valuable piece of information!")
+				return ["talking", "default"]
 		if state == "listening":
 			if option == "stop listening":
-				return ["sitting", 0]
+				return ["sitting", "default"]
 			elif option == "participate":
-				return ["participating", 0]
+				return ["participating", "default"]
 		if state == "standing":
 			if option == "sit":
-				return ["sitting", 0]
+				return ["sitting", "default"]
 			elif option == "leave class":
-				return ["quit", 4]
+				return ["quit", "outside"]
 		if state == "drawing":
 			if option == "stop drawing":
-				return ["sitting", 0]
+				return ["sitting", "default"]
 			elif option == "make masterpiece":
-				return ["quit", 2]
+				return ["quit", "draw"]
 		if state == "participating":
 			if option == "stop participating":
-				return ["listening", 0]
+				return ["listening", "default"]
 			elif option == "keep participating!":
-				return ["quit", 3]
-		return ["quit", 1]
+				return ["quit", "smart"]
+		return ["quit", "error"]
 
 escape()
