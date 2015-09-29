@@ -24,22 +24,25 @@ class Inventory:
 				print("You can't add any more " + name + " to your inventory!")
 			else:
 				self.items[name][1] += 1
-				print("You have added added " + name + " to your inventory!")
+				print("You have added " + name + " to your inventory!")
 		else:
 			self.items[name] = [max_num, 1]
-			print("You have added added " + name + " to your inventory!")
+			print("You have added " + name + " to your inventory!")
 
 	def use(self, name):
 		if name in self.items and self.items[name][1] > 0:
 			self.items[name][1] -= 1
+			print("You have used the item \"" + name + "\"!")
+			return True
 		else:
-			print("You don't have this!")
+			print("You don't have the item \"" + name + "\"!")
+			return False
 
 	def update_max(self, name, max_num):
 		if name in self.items:
 			self.items[name][0] = max_num
 		else:
-			print("You don't have this item!")
+			print("You don't have the item \"" + name + "\"!")
 
 	def is_empty(self):
 		for item in self.items:

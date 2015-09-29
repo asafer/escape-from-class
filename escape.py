@@ -60,7 +60,10 @@ def get_options(state):
 	"talking": ["stop talking", "keep talking"], \
 	"standing": ["sit", "leave class"], \
 	"drawing": ["stop drawing", "make masterpiece"], \
-	"participating": ["stop participating", "keep participating!"]}
+	"participating": ["stop participating", "keep participating!"], \
+	"outside": ["go back in", "look around"], \
+	"looking": ["talk to person", "go back in"], \
+	"continuing": []} # add story here!!
 
 	options = ["quit", "check inventory"]
 	if state in states:
@@ -79,25 +82,34 @@ def do_option(option, state):
 		return [state, "default"]
 	else:
 		states = {"sitting": {"listen": ["listening", "default"], \
-					"gossip": ["talking", "default"], \
-					"stand": ["standing", "default"], \
-					"doodle": ["drawing", "default"]}, \
-		"talking": {"stop talking": ["sitting", "default"], \
-					"keep talking": ["talking", "default", "valuable gossip", 1]}, \
-		"listening": {"stop listening": ["sitting", "default"], \
-					"participate": ["participating", "default"]}, \
-		"standing": {"sit": ["sitting", "default"], \
-					"leave class": ["quit", "outside"]}, \
-		"participating": {"stop participating": ["sitting", "default"], \
-					"keep participating!": ["quit", "smart"]}, \
-		"drawing": {"stop drawing": ["sitting", "default"], \
-					"make masterpiece": ["quit", "draw"]}}
+								"gossip": ["talking", "default"], \
+								"stand": ["standing", "default"], \
+								"doodle": ["drawing", "default"]}, \
+					"talking": {"stop talking": ["sitting", "default"], \
+								"keep talking": ["talking", "default", 0, "valuable gossip", 1]}, \
+					"listening": {"stop listening": ["sitting", "default"], \
+								"participate": ["participating", "default"]}, \
+					"standing": {"sit": ["sitting", "default"], \
+								"leave class": ["outside", "default"]}, \
+					"participating": {"stop participating": ["sitting", "default"], \
+								"keep participating!": ["quit", "smart"]}, \
+					"drawing": {"stop drawing": ["sitting", "default"], \
+								"make masterpiece": ["quit", "draw"]}, \
+					"outside": {"go back in": ["standing", "default"], \
+								"look around": ["looking", "default"]}, \
+					"looking": {"go back in": ["standing", "default"], \
+								"talk to person": ["continuing", "default", 1, "valuable gossip"]}}
 		if state in states and option in states[state]:
 			value = states[state][option]
-			if len(value) == 2: # no addition to inventory
+			if len(value) == 2: # don't do anything with inventory
 				return value
-			else: # adding somthing to inventory (this is currently confusing)
-				itory.add(value[2], value[3])
+			else: # do something with inventory
+				if value[2] == 0: # add
+					itory.add(value[3], value[4])
+				elif value[2] == 1: # use
+					success = itory.use(value[3])
+					if not success:
+						return [state, "default"]
 				return value[:2]
 	return ["quit", "error"]
 
