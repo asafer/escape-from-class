@@ -10,8 +10,8 @@ class Inventory:
 
 	def __str__(self):
 		if self.is_empty():
-			return "Your inventory is empty!"
-		s = "Inventory contents:\n" # fix later
+			return "\nYour inventory is empty!"
+		s = "\nInventory contents:\n" # fix later
 		for item in self.items:
 			if self.items[item][1] > 0:
 				s += item
@@ -19,6 +19,7 @@ class Inventory:
 		return s
 
 	def add(self, name, max_num):
+		print()
 		if name in self.items:
 			if self.items[name][0] == self.items[name][1]:
 				print("You can't add any more " + name + " to your inventory!")
@@ -30,6 +31,7 @@ class Inventory:
 			print("You have added " + name + " to your inventory!")
 
 	def use(self, name):
+		print()
 		if name in self.items and self.items[name][1] > 0:
 			self.items[name][1] -= 1
 			print("You have used the item \"" + name + "\"!")
@@ -39,6 +41,7 @@ class Inventory:
 			return False
 
 	def update_max(self, name, max_num):
+		print()
 		if name in self.items:
 			self.items[name][0] = max_num
 		else:

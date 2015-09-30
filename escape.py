@@ -8,6 +8,12 @@ endgames = {"default": "You gave up.", \
 "smart": "You participate so much that the professor remembers your name for the rest of the semester. You still only get an A-.", \
 "outside": "You have successfully escaped from class! Good luck passing without any notes."}
 
+# when we want to tell the player something. Max one per state right now.
+texts = {"sitting": "Maybe you should do something.", \
+		"looking": "You see a person hanging out by the door. They look like they might talk to you if you give them some information.", \
+		"LEVEL TWO": "The person seems pleased with the gossip. They point out a cool looking tunnel you could explore. And they give you a flashlight.", \
+		"in tunnel": "You are in the tunnel. Suddenly, the entrance shuts behind you. Good thing you have a flashlight!"}
+
 # now we can store things yay!
 itory = None
 
@@ -39,6 +45,9 @@ def escape():
 	state = ["sitting", "default"]
 	quit = 0
 	while (not quit):
+		print()
+		if state[0] in texts:
+			print(texts[state[0]])
 		print("Your current state is:", state[0])
 		print("What would you like to do next?")
 		options = get_options(state[0])
@@ -63,7 +72,8 @@ def get_options(state):
 	"participating": ["stop participating", "keep participating!"], \
 	"outside": ["go back in", "look around"], \
 	"looking": ["talk to person", "go back in"], \
-	"continuing": []} # add story here!!
+	"LEVEL TWO": ["enter tunnel"], \
+	"in tunnel": []} # add story here!!
 
 	options = ["quit", "check inventory"]
 	if state in states:
@@ -86,7 +96,7 @@ def do_option(option, state):
 								"stand": ["standing", "default"], \
 								"doodle": ["drawing", "default"]}, \
 					"talking": {"stop talking": ["sitting", "default"], \
-								"keep talking": ["talking", "default", 0, "valuable gossip", 1]}, \
+								"keep talking": ["talking", "default", [(0, "valuable gossip", 1)]]}, \
 					"listening": {"stop listening": ["sitting", "default"], \
 								"participate": ["participating", "default"]}, \
 					"standing": {"sit": ["sitting", "default"], \
@@ -98,18 +108,20 @@ def do_option(option, state):
 					"outside": {"go back in": ["standing", "default"], \
 								"look around": ["looking", "default"]}, \
 					"looking": {"go back in": ["standing", "default"], \
-								"talk to person": ["continuing", "default", 1, "valuable gossip"]}}
+								"talk to person": ["LEVEL TWO", "default", [(1, "valuable gossip"), (0, "flashlight", 1)]]}, \
+					"LEVEL TWO": {"enter tunnel": ["in tunnel", "default"]}}
 		if state in states and option in states[state]:
 			value = states[state][option]
 			if len(value) == 2: # don't do anything with inventory
 				return value
-			else: # do something with inventory
-				if value[2] == 0: # add
-					itory.add(value[3], value[4])
-				elif value[2] == 1: # use
-					success = itory.use(value[3])
-					if not success:
-						return [state, "default"]
+			else: # do something with inventory (list of tuples)
+				for tup in value[2]:
+					if tup[0] == 0: # add
+						itory.add(tup[1], tup[2])
+					elif tup[0] == 1: # use
+						success = itory.use(tup[1])
+						if not success:
+							return [state, "default"]
 				return value[:2]
 	return ["quit", "error"]
 
