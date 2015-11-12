@@ -73,7 +73,9 @@ def get_options(state):
 	"outside": ["go back in", "look around"], \
 	"looking": ["talk to person", "go back in"], \
 	"LEVEL TWO": ["enter tunnel"], \
-	"in tunnel": []} # add story here!!
+	"in tunnel": ["explore tunnel", "try to escape from tunnel"], \
+	"exploring": [], \
+	"trying to escape": []} # add story here!!
 
 	options = ["quit", "check inventory"]
 	if state in states:
@@ -109,7 +111,9 @@ def do_option(option, state):
 								"look around": ["looking", "default"]}, \
 					"looking": {"go back in": ["standing", "default"], \
 								"talk to person": ["LEVEL TWO", "default", [(1, "valuable gossip"), (0, "flashlight", 1)]]}, \
-					"LEVEL TWO": {"enter tunnel": ["in tunnel", "default"]}}
+					"LEVEL TWO": {"enter tunnel": ["in tunnel", "default"]}, \
+					"in tunnel": {"explore tunnel": ["exploring", "default"], \
+								"try to escape from tunnel": ["trying to escape", "default"]}}
 		if state in states and option in states[state]:
 			value = states[state][option]
 			if len(value) == 2: # don't do anything with inventory
